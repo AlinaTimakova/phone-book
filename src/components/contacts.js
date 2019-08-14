@@ -1,5 +1,4 @@
 import React from 'react'
-import $ from "jquery";
 
 class Contacts extends React.Component {
   constructor(props) {
@@ -11,41 +10,41 @@ class Contacts extends React.Component {
       /*  прокси - сервер https://cors-anywhere.herokuapp.com/ для обхода CORS  */
       url: "https://cors-anywhere.herokuapp.com/https://gorest.co.in/public-api/users/?first_name="
     };
-
   }
+
   getData(){
     const url = this.state.url;
-    $.ajax({
-      type: 'get',
-      dataType: 'json',
-      url: url, 
-      crossDomain: true,
-      // установка header для авторизации 
-      // пароль меняется каждые 15-20 минут
-      beforeSend: function (xhr) {   
-        xhr.setRequestHeader ('Authorization', "Bearer LkyyQTFjqRCgl4gSJtyQqlFBrVAU1u1OkJAP");
-      },
-      //при успешном выполнении запроса
-      success: function(results){
-        if(results._meta.code !== 200){
-          console.log("Not Authorization");
-          this.setState( {
-            error: 1,
-            isLoading: false
-          });
-        }
-        else {
-          this.setState({
-            data: results.result,
-            isLoading: false
-          })
-        }
-      }.bind(this),
-
-      error: function(status, err) {
-        console.error(this.props.url, status, err.toString());
-      }.bind(this)
-    })
+    const bearer = 'Bearer GOoM5CZ16G2N4mS1-Z8C4kNeKRxtEQ2PdObh';
+    fetch(url, {
+      method: 'GET',
+      withCredentials: true,
+      headers: {
+          'Authorization': bearer,
+          'Content-Type': 'application/json'}
+      }).then(response=> {  
+          console.log(url);
+          if (response.status !== 200) {
+            if(response.status===404){
+              console.log("Not Authorization");
+              return;
+            }
+            console.log(response);  
+            console.log('Not. Status Code: ' +  response.status); 
+              this.setState( {
+                error: 1,
+                isLoading: false
+              }); 
+            return;  
+          }
+          // Examine the text in the response  
+          response.json().then(response=>{
+            console.log(response); 
+            this.setState({
+              data: response.result,
+              isLoading: false
+            }) 
+        })
+      }).catch(error => this.setState({ isLoading: false }));
   }
 
   UNSAFE_componentWillReceiveProps(nextProps){
